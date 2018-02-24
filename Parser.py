@@ -16,11 +16,11 @@ class Parser:
             lineItems = []
             bracketCnt += 1
             linePose += 1
-    
+            operand = ""
             while line[linePose] != ")" and line[linePose] != "(" and line[linePose] != " ": # step through line until the end of the operator, primitive, or argument is found
-                lineItems.append(line[linePose])
+                operand += line[linePose]
                 linePose += 1
-    
+            lineItems.append(operand)
     
             while(not Parser.checkEnd(line, linePose, bracketCnt)):
                 linePose = Parser.skipWhiteSpace(line, linePose)
