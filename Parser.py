@@ -36,6 +36,8 @@ class Parser:
                 
             
             return lineItems
+            
+        return line
     
     def skipWhiteSpace(line, linePose): #returns linePose after white space
         while line[linePose] == " ":
@@ -43,7 +45,7 @@ class Parser:
         return linePose
         
     def checkEnd(line, linePose, bracketStck):
-        print(bracketStck)
+        # print(bracketStck)
         if linePose >= len(line) and len(bracketStck) != 0:
             print("End of line before closed brackets")
             return True
