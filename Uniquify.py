@@ -7,7 +7,7 @@ class Uniquify:
     def uniquify(line):
         program = Parser.resolveLayer(line)
         if program[0].lower() == 'program':
-            print(Uniquify.uniquifyHelper(program[1], dict()))
+            return "(program " + Uniquify.uniquifyHelper(program[1], dict()) + ")"
         else:
             print("Exception")
             
@@ -42,7 +42,7 @@ class Uniquify:
         if line[0] in argList.keys():
             return argList[line[0]]
         
-        return line[0]
+        return line
 
 
 
