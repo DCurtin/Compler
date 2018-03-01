@@ -1,5 +1,5 @@
-from Uniquify import Uniquify
-from Parser import Parser
+import Uniquify
+import Parser
 
 class Flatten(object):
 
@@ -17,7 +17,7 @@ class Flatten(object):
                 programUnique[1].add("tmp."+str(value))
             self.tempVars = 0
             return [flattened, programUnique[1]]
-            
+
     def flattenHelper(self, line):
         lineLst = Parser.resolveLayer(line)
         if lineLst[0] == "let":
@@ -31,19 +31,19 @@ class Flatten(object):
                 self.tempVars -= 1
             else:
                 init_assign = "(assign " + var + " " + valLst[0] + ") "
-            
+
             bodyLst = self.flattenHelper(lineLst[2])
             init_assign += bodyLst[1]
-            
+
             return [var, init_assign]
-        
+
         if lineLst[0] == "+" or lineLst[0] == "-":
             return self.flattenBinaryOp(lineLst)
-        
-            
+
+
         # print(line)
         return [line,""]
-        
+
     def flattenBinaryOp(self, lineLst):
         """
             Recursively flatten the first and second arguments (should be able to handle more than one arg
@@ -70,5 +70,5 @@ class Flatten(object):
         # var = "tmp." + str(self.tempVars)
         # self.tempVars += 1
         # assign = var1Lst[1] + var2Lst[1] + "(assign " + var + " (" + lineLst[0] + " " + var1Lst[0] + " " + var2Lst[0] + "))"
-        
+
         return [var, assign]
