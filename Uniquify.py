@@ -7,17 +7,21 @@ class Uniquify:
     def uniquify(line):
         program = Parser.resolveLayer(line)
         if program[0].lower() == 'program':
-            return "(program " + Uniquify.uniquifyHelper(program[1], dict()) + ")"
+            uniquieProg = Uniquify.uniquifyHelper(program[1], dict())
+            return ["(program "+ uniquieProg[0] + ")", uniquieProg[1]]
         else:
             print("Exception")
             
     def uniquifyHelper(line, argList):
+        argLabel = set()
         line = Parser.resolveLayer(line)
 
         if line[0].lower() == "let": # operand
             init  = Parser.resolveLayer(line[1]) # parse init
             var = init[0] # store init variable
-            val = Uniquify.uniquifyHelper(init[1], argList) # store and parse var value
+            valUniq = Uniquify.uniquifyHelper(init[1], argList) # store and parse var value
+            val = valUniq[0]
+            argLabel.update(valUniq[1])
 
             '''
                update arglist
@@ -26,23 +30,38 @@ class Uniquify:
                 argList[var] = var + ".0"
             else:
                 argList[var] = Uniquify.incrementVar(argList[var])
+            argLabel.add(argList[var])
                 #increment count
             var = argList[var]
-            body = Uniquify.uniquifyHelper(line[2], argList) #
+            bodyUniq = Uniquify.uniquifyHelper(line[2], argList) #
+            body = bodyUniq[0]
+            argLabel.update(bodyUniq[1])
 
             #build string
-            return "(let" + " ([" + var + " " + val + "]) " + body + ")"
+            return ["(let" + " ([" + var + " " + val + "]) " + body + ")", argLabel]
 
         if line[0].lower() == "+":
-            return "(+ " + Uniquify.uniquifyHelper(line[1], argList.copy()) + " " + Uniquify.uniquifyHelper(line[2], argList.copy()) + ")"
+            uniqVar1 = Uniquify.uniquifyHelper(line[1], argList.copy())
+            var1 = uniqVar1[0]
+            argLabel.update(uniqVar1[1])
+             
+            uniqVar2 = Uniquify.uniquifyHelper(line[2], argList.copy())
+            var2 = uniqVar2[0]
+            argLabel.update(uniqVar2[1])
+             
+            return ["(+ " + var1 + " " + var2+ ")", argLabel]
         
         if line[0].lower() == "-":
-            return "(- " + Uniquify.uniquifyHelper(line[1], argList.copy()) + " " + Uniquify.uniquifyHelper(line[2], argList.copy()) + ")"
+            uniqVar1 = Uniquify.uniquifyHelper(line[1], argList.copy())
+            var1 = uniqVar1[0]
+            argLabel.update(uniqVar1[1])
+            
+            return ["(- " + var1 + ")", argLabel]
             
         if line[0] in argList.keys():
-            return argList[line[0]]
+            return [argList[line[0]], argLabel]
         
-        return line
+        return [line, argLabel]
 
 
 

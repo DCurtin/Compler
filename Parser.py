@@ -19,8 +19,9 @@ class Parser:
             while line[linePose] == "(" or line[linePose] == "[":
                 bracketStck.append(line[linePose])
                 linePose += 1
-            
-            while line[linePose] != ")" and line[linePose] != "]" and line[linePose] != "(" and line[linePose] != " ": # step through line until the end of the operator, primitive, or argument is found
+                
+            # step through line until the end of the operator, primitive, or argument is found
+            while line[linePose] != ")" and line[linePose] != "]" and line[linePose] != "(" and line[linePose] != " ": 
                 operand += line[linePose]
                 linePose += 1
             lineItems.append(operand)
@@ -49,7 +50,8 @@ class Parser:
         if linePose >= len(line) and len(bracketStck) != 0:
             print("End of line before closed brackets")
             return True
-        while line[linePose] == ")" or line[linePose] == "]": # end of line, check for miscount on brackets otherwise lineItem is a primitive or variable
+        # end of line, check for miscount on brackets otherwise lineItem is a primitive or variable
+        while line[linePose] == ")" or line[linePose] == "]": 
                 bracket = bracketStck.pop()
                 
                 if line[linePose] == "]" and bracket == "(":

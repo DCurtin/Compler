@@ -7,7 +7,7 @@ class  SelectInstructions:
         fl = Flatten()
         program = fl.flatten(line)
         # print(program)
-        program = Parser.resolveLayer(program)
+        program = Parser.resolveLayer(program[0])
         # print(program)
         lineAsm = ""
         for line in program:
@@ -33,5 +33,4 @@ class  SelectInstructions:
             
     def resolveInt(input):
         if isDecimal(input[1]):
-            isDecimal[0
-
+            isDecimal[0]

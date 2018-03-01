@@ -7,12 +7,16 @@ class Flatten(object):
     def flatten(self, program):
         programUnique = Uniquify.uniquify(program)
         # print("uniquified: \n" + programUnique)
-        programUniqueLst = Parser.resolveLayer(programUnique)
+        programUniqueLst = Parser.resolveLayer(programUnique[0])
+        #programUniqueLst = programUnique[0]
         if programUniqueLst[0].lower() == "program":
             flattened = "(program " + self.flattenHelper(programUniqueLst[1])[1] + ")"
             # print(flattened)
+            self.tempVars -= 1
+            for value in range(self.tempVars):
+                programUnique[1].add("tmp."+str(value))
             self.tempVars = 0
-            return flattened
+            return [flattened, programUnique[1]]
             
     def flattenHelper(self, line):
         lineLst = Parser.resolveLayer(line)
@@ -26,7 +30,7 @@ class Flatten(object):
                 init_assign = valLst[1].replace(valLst[0], var)
                 self.tempVars -= 1
             else:
-                init_assign = "(assign " + var + " " + valLst[0] + ")"
+                init_assign = "(assign " + var + " " + valLst[0] + ") "
             
             bodyLst = self.flattenHelper(lineLst[2])
             init_assign += bodyLst[1]
@@ -44,13 +48,27 @@ class Flatten(object):
         """
             Recursively flatten the first and second arguments (should be able to handle more than one arg
         """
-        var1Lst = self.flattenHelper(lineLst[1])
-        var2Lst = self.flattenHelper(lineLst[2])
+        varsLst = lineLst[1:]
+        priorAssign = ""
+        assign = lineLst[0].strip() + " "
+        for var in varsLst:
+            varFlat = self.flattenHelper(var)
+            priorAssign += varFlat[1] + " "
+            assign += varFlat[0] + " "
+
+        assign = assign.strip()
+        priorAssign = priorAssign.strip()
+        var = "tmp." + str(self.tempVars)
+        assign = priorAssign + " " + "(assign " +  var + " (" + assign + "))"
+        self.tempVars += 1
+
+        # var1Lst = self.flattenHelper(lineLst[1])
+        # var2Lst = self.flattenHelper(lineLst[2])
         """
             get the temp var for 
         """
-        var = "tmp." + str(self.tempVars)
-        self.tempVars += 1
-        assign = var1Lst[1] + var2Lst[1] + "(assign " + var + " (" + lineLst[0] + " " + var1Lst[0] + " " + var2Lst[0] + "))"
+        # var = "tmp." + str(self.tempVars)
+        # self.tempVars += 1
+        # assign = var1Lst[1] + var2Lst[1] + "(assign " + var + " (" + lineLst[0] + " " + var1Lst[0] + " " + var2Lst[0] + "))"
         
         return [var, assign]
