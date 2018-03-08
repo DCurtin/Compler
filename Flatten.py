@@ -26,16 +26,19 @@ class Flatten(object):
             # print("var: " + var)
             valLst = self.flattenHelper(init[1]) #flatten out value of the var
             init_assign = ""
-            if "assign" in valLst[1]:
+            # print("VAL LST 0: " + str(valLst[0]))
+            # print("VAL LST 1: " + str(valLst[1]))
+            if "assign" in valLst[1] and "tmp" in valLst[0]:
                 init_assign = valLst[1].replace(valLst[0], var)
                 self.tempVars -= 1
             else:
-                init_assign = "(assign " + var + " " + valLst[0] + ") "
-
+                init_assign = valLst[1] + "(assign " + var + " " + valLst[0] + ") "
+            
             bodyLst = self.flattenHelper(lineLst[2])
+            # print("BDY LST: " + str(bodyLst))
             init_assign += bodyLst[1]
 
-            return [var, init_assign]
+            return [bodyLst[0], init_assign]
 
         if lineLst[0] == "+" or lineLst[0] == "-":
             return self.flattenBinaryOp(lineLst)

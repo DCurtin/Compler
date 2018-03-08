@@ -9,7 +9,7 @@ def liveness(line):
         return None
     liveness = []
     instructions = programInstructions[1:]
-    print(instructions)
+    # print(instructions)
     instructions.reverse()
     for instruct in instructions: #reverse list
         instructParsed = Parser.resolveLayer(instruct)
@@ -32,6 +32,7 @@ def liveness(line):
                 lastEntrySet.add(instructParsed[1])
         #print(lastEntrySet)
         liveness.append(lastEntrySet)
-    print(liveness.reverse())
+    # print(liveness.reverse())
+    liveness.reverse()
     return [liveness, program[1]]
             

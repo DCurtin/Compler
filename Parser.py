@@ -9,6 +9,7 @@ def resolveLayer(line):
         [1] = first_arg
         [2] = second_arg (some operators are unary)
     '''
+    line = line.strip()
     bracketStck = []
     linePose = 0
     if line[linePose] == "(": # open bracket found, get operator, primitive, or argument
@@ -20,7 +21,7 @@ def resolveLayer(line):
             linePose += 1
 
         # step through line until the end of the operator, primitive, or argument is found
-        while line[linePose] != ")" and line[linePose] != "]" and line[linePose] != "(" and line[linePose] != " ": 
+        while line[linePose] != ")" and line[linePose] != "]" and line[linePose] != "(" and line[linePose] != " ":
             operand += line[linePose]
             linePose += 1
         lineItems.append(operand)
