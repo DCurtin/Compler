@@ -9,7 +9,7 @@ def selectInstructions(line):
     # print(program)
     lineAsm = ""
     for line in programLst:
-        print(line)
+        # print(line)
         if line == "Program":
             continue
         lineLst = Parser.resolveLayer(line)
@@ -17,18 +17,21 @@ def selectInstructions(line):
             lineOp = Parser.resolveLayer(lineLst[2])
 
             if len(lineOp) < 2:
-                lineAsm += "(movq " + resolveInt(lineOp) + " " + lineLst[1] + ") "
+                lineAsm += "(movq " + resolveCon(lineOp, program[1]) + " " + resolveCon(lineLst[1], program[1]) + ") "
             else:
                 if lineOp[0] == "+":
-                    lineAsm += "(movq " + resolveInt(lineOp[1]) + " " + lineLst[1] + ") "
-                    lineAsm += "(addq " + resolveInt(lineOp[2]) + " " + lineLst[1] + ")  "
+                    lineAsm += "(movq " + resolveCon(lineOp[1], program[1]) + " " + resolveCon(lineLst[1], program[1]) + ") "
+                    lineAsm += "(addq " + resolveCon(lineOp[2], program[1]) + " " + resolveCon(lineLst[1], program[1]) + ")  "
                 if lineOp[0] == "-":
-                    lineAsm += "(movq (int 0) " + lineLst[1] + ") "
-                    lineAsm += "(subq " + resolveInt(lineOp[1]) + " " + lineLst[1] + ") "
+                    lineAsm += "(movq (int 0) " + resolveCon(lineLst[1], program[1]) + ") "
+                    lineAsm += "(subq " + resolveCon(lineOp[1], program[1]) + " " + resolveCon(lineLst[1], program[1]) + ") "
     asmAndVars = ["(program " + lineAsm.strip() + ")", program[1]]
     return asmAndVars
 
-def resolveInt(input): # not crazy about this work-around though it's more robust than other methods of checking int that I am aware of 
+def resolveCon(input, varLst): # not crazy about this work-around though it's more robust than other methods of checking int that I am aware of 
+    if input in varLst:
+        return "(var " + input + ")"
+
     try:
         int(input)
         return "(int " + input + ")"

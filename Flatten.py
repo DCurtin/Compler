@@ -12,7 +12,7 @@ class Flatten(object):
         if programUniqueLst[0].lower() == "program":
             flattened = "(program " + self.flattenHelper(programUniqueLst[1])[1] + ")"
             # print(flattened)
-            self.tempVars -= 1
+            # self.tempVars -= 1
             for value in range(self.tempVars):
                 programUnique[1].add("tmp."+str(value))
             self.tempVars = 0
