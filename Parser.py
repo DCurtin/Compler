@@ -115,3 +115,31 @@ def parseArg(line, linePose):
             linePose += 1
         return lineItem, linePose
 
+
+def resolveCon(input, varLst):
+    if input in varLst:
+        return "(var " + input + ")"
+    
+    if resolveInt(input):
+        return "(int " + input + ")"
+    else:
+        return input
+
+def resolveInt(input): # not crazy about this work-around though it's more robust than other methods of checking int that I am aware of 
+    try:
+        int(input)
+        return True
+    except:
+        return False
+        
+def resolveBool(input): # not crazy about this work-around though it's more robust than other methods of checking int that I am aware of 
+    if input == "#t" or input == "#f":
+        return True
+    else:
+        return False
+
+def resolvePrim(input):
+    if resolveBool(input) or resolveInt(input):
+        return True
+    else:
+        return False

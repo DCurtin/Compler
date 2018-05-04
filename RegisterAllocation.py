@@ -1,16 +1,26 @@
 import SelectInstructions
 import Parser
 
-def liveness(line, registers):
-    #program = SelectInstructions.selectInstructions(line)
-    program = line
-    programInstructions = Parser.resolveLayer(program)
+def registerAllocation(line, registers):
+    program = SelectInstructions.selectInstructions(line)
+    #program = line
+    #print(program)
+    programInstructions = Parser.resolveLayer(program[0])
     if programInstructions[0].lower() != "program":
         print("Incorrect program structure")
         return None
-    liveness = []
-    
     instructions = programInstructions[1:]
+    
+    
+    live = liveness(instructions)
+    interference = interference_graph(instructions, live)
+    colors = color_assign(interference)
+    program_registers_allocated = assignment(registers, colors, program[0])
+    
+    return [live, interference, colors, program_registers_allocated]
+    
+def liveness(instructions):
+    live = []
     # print(instructions)
     instructions.reverse()
     for instruct in instructions: #reverse list
@@ -19,8 +29,8 @@ def liveness(line, registers):
         lastEntrySet = set()
         #lastEntrySet.add() #add empty
         #print("intrstruction: " + str(instructParsed))
-        if len(liveness) > 0:
-                lastEntrySet = liveness[-1].copy()#get after set of the previous position
+        if len(live) > 0:
+                lastEntrySet = live[-1].copy()#get after set of the previous position
         if instructParsed[0] == "movq":
             #get last entry from liveness list
             #union read with last set - current write
@@ -41,24 +51,25 @@ def liveness(line, registers):
             if Parser.resolveLayer(instructParsed[1])[0] == "var": 
                 lastEntrySet.add(instructParsed[1])
         #print(lastEntrySet)
-        liveness.append(lastEntrySet)
+        live.append(lastEntrySet)
      #print(liveness.reverse())
-    liveness.pop()#remove first entry, treat set as after(i)
-    liveness.reverse()
-    liveness.append(set())
+    live.pop()#remove first entry, treat set as after(i)
+    live.reverse()
+    live.append(set())
     instructions.reverse()
     
-    interference = interference_graph(instructions, liveness)
-    colors = color_assign(interference)
-    assignment(colors, program)
-    return [liveness, interference, program[1]]
+    print("Liveness debug \n")
+    for line in live:
+        print(line)
+    
+    return live
 
 def interference_graph(instructions, liveness):
     interference = dict()
     for i in range(len(instructions)):
         instructParsed = Parser.resolveLayer(instructions[i])
         if instructParsed[0] == "movq":
-            print(instructParsed)
+            #print(instructParsed)
             dest = instructParsed[2]
             src = instructParsed[1]
             if Parser.resolveLayer(dest)[0] == "var":
@@ -91,8 +102,9 @@ def interference_graph(instructions, liveness):
                         if dest not in interference:
                             interference[dest] = set()
                         interference[dest].add(val)
-    #for key in interference:
-    #    print(key + " : " + str(interference[key]))
+    print("\ninterference debug: \n")
+    for key in interference:
+        print(key + " : " + str(interference[key]))
     return interference
     
 def color_assign(interference):
@@ -120,10 +132,13 @@ def color_assign(interference):
             color_set.add(max_node)
             colors.append(color_set)
         nodes.remove(max_node)
+        
+    for color in colors:
+        print("color_debug: " + str(color))
     return colors
     
-def assignment(colors, program):
-    registers = ['rbx']
+def assignment(registers, colors, program):
+    #registers = ['rbx']
     mem_base = 8
     reg_cnt = len(registers)
     color_cnt = len(colors)
@@ -141,7 +156,7 @@ def assignment(colors, program):
             for var in colors[indx]:
                 program = program.replace(var, "(deref rbp -" + str(mem_base*(indx - reg_cnt + 1)) + ")")
         
-    print(program)
+    
     return program
     
 
